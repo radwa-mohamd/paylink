@@ -11,9 +11,9 @@ Year Work Project - Faculty of Computers and Information, Cairo University.
 | # | Member | Main area |
 |---|--------|-----------|
 | 1 | Radwa | Accounts, Wallet, Biller Catalog, Fees |
-| 2 | (name) | Payment Processing, Fraud Checks |
-| 3 | (name) | Biller Integration, Reconciliation |
-| 4 | (name) | Notifications, DevOps, Admin |
+| 2 | Habiba | Payment Processing, Fraud Checks |
+| 3 | Jana | Biller Integration, Reconciliation |
+| 4 | Nourhan | Notifications, DevOps, Admin |
 
 ## Tech stack
 
