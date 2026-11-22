@@ -10,7 +10,7 @@ Year Work Project - Faculty of Computers and Information, Cairo University.
 
 | # | Member | Main area |
 |---|--------|-----------|
-| 1 | (name) | Accounts, Wallet, Biller Catalog, Fees |
+| 1 | Radwa | Accounts, Wallet, Biller Catalog, Fees |
 | 2 | (name) | Payment Processing, Fraud Checks |
 | 3 | (name) | Biller Integration, Reconciliation |
 | 4 | (name) | Notifications, DevOps, Admin |
