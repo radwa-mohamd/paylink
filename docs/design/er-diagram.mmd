@@ -1,0 +1,101 @@
+erDiagram
+    %% Ledger rule: amount is always positive, entry_type decides the effect:
+    %% TOP_UP, REFUND, COMMISSION : available +
+    %% HOLD    : available -, held +
+    %% RELEASE : available +, held -
+    %% CHARGE  : held -
+    %% available and held are computed from ledger_entries, never stored.
+    %% Money columns are exact decimals (NUMERIC in the database), never float.
+
+    customers ||--|| wallets : "owns"
+    wallets ||--o{ ledger_entries : "records"
+    wallets ||--o{ top_ups : "receives"
+    customers |o--o{ top_ups : "agent performs"
+    billers ||--o{ services : "offers"
+    services ||--o{ service_input_fields : "requires"
+    services ||--o{ fee_rules : "priced by"
+    billers ||--o{ promotions : "has"
+
+    customers {
+        int customer_id PK
+        string name
+        string phone UK
+        string password_hash
+        string account_type "CUSTOMER, AGENT, SYSTEM"
+        string verification_level "BASIC, VERIFIED"
+        string status "ACTIVE, BLOCKED"
+        datetime created_at
+    }
+
+    wallets {
+        int wallet_id PK
+        int customer_id FK, UK
+        datetime created_at
+    }
+
+    ledger_entries {
+        int entry_id PK
+        int wallet_id FK
+        string entry_type "TOP_UP, HOLD, RELEASE, CHARGE, REFUND, COMMISSION"
+        decimal amount
+        string reference_type "TOP_UP, PAYMENT, ..."
+        int reference_id
+        datetime created_at
+    }
+
+    top_ups {
+        int top_up_id PK
+        int wallet_id FK
+        int agent_id FK "null for card top-up"
+        string method "CARD, AGENT_CASH"
+        decimal amount
+        string status "SUCCESS, DECLINED"
+        datetime created_at
+    }
+
+    billers {
+        int biller_id PK
+        string name UK
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    services {
+        int service_id PK
+        int biller_id FK
+        string name
+        decimal min_amount
+        decimal max_amount
+        boolean is_active
+    }
+
+    service_input_fields {
+        int field_id PK
+        int service_id FK
+        string field_name
+        boolean is_required
+        string data_type
+    }
+
+    fee_rules {
+        int fee_rule_id PK
+        int service_id FK
+        string fee_type "FIXED, PERCENTAGE, TIERED"
+        decimal fixed_amount
+        decimal percentage
+        decimal minimum_fee
+        decimal threshold_amount
+        decimal fee_below_threshold
+        decimal fee_above_threshold
+        date effective_from
+        date effective_to
+    }
+
+    promotions {
+        int promotion_id PK
+        int biller_id FK
+        date start_date
+        date end_date
+        boolean is_active
+    }

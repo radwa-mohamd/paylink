@@ -1,5 +1,21 @@
 # Part 1 - User Stories
 
+## Problem Summary
+
+PayLink is a bill-payment and wallet backend for a company in Egypt, similar to Fawry. Customers pay utility bills (electricity, water, mobile top-up and internet) from a digital wallet, either in the app or through agents. PayLink holds customers' money, so it must be correct: no customer may be charged twice, and no balance may become negative. A payment can fail at many steps (fraud checks, the biller not answering, a late callback), so the system must handle each failure safely. Our team builds the backend, with a design that makes adding new billers easy and that records every money movement in a ledger.
+
+## Stakeholders
+
+| Stakeholder                          | What they need from the system                                        |
+| ------------------------------------ | --------------------------------------------------------------------- |
+| Customer                             | Pay bills quickly and safely from the wallet; see balance and history |
+| Agent                                | Pay on behalf of customers and earn commission                        |
+| Biller (ElectroCo, AquaCo, TopUpNet) | Receive correct payments and a matching settlement                    |
+| PayLink admin                        | Manage billers, fees and limits without redeploying                   |
+| Support employee                     | Find a payment, see its history, block or unblock accounts            |
+| PayLink management and finance       | Earn fees, avoid losses, get daily totals                             |
+| Regulators                           | Safe handling of customers' money and an audit trail                  |
+
 ## US-1: Register a customer (FR-1, Must)
 
 As a new customer,
