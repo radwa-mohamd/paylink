@@ -1,0 +1,126 @@
+classDiagram
+    %% Domain classes for accounts, wallet, biller catalog and fees.
+    %% Wallet has no stored balance: available and held are computed from ledger entries.
+    %% Money values use an exact decimal type, never float.
+
+    class Customer {
+        +int customerId
+        +String name
+        +String phone
+        +String passwordHash
+        +AccountType accountType
+        +VerificationLevel verificationLevel
+        +String status
+        +DateTime createdAt
+        +isBlocked() boolean
+        +upgradeToVerified() void
+        +getDailyLimit() Decimal
+    }
+
+    class Wallet {
+        +int walletId
+        +DateTime createdAt
+        +getAvailableBalance() Decimal
+        +getHeldBalance() Decimal
+    }
+
+    class LedgerEntry {
+        +int entryId
+        +EntryType entryType
+        +Decimal amount
+        +String referenceType
+        +int referenceId
+        +DateTime createdAt
+    }
+
+    class TopUp {
+        +int topUpId
+        +String method
+        +Decimal amount
+        +String status
+        +DateTime createdAt
+    }
+
+    class Biller {
+        +int billerId
+        +String name
+        +boolean isActive
+        +DateTime createdAt
+        +DateTime updatedAt
+        +enable() void
+        +disable() void
+    }
+
+    class Service {
+        +int serviceId
+        +String name
+        +Decimal minAmount
+        +Decimal maxAmount
+        +boolean isActive
+        +isAmountAllowed(amount) boolean
+    }
+
+    class ServiceInputField {
+        +int fieldId
+        +String fieldName
+        +boolean isRequired
+        +String dataType
+    }
+
+    class FeeRule {
+        +int feeRuleId
+        +String feeType
+        +Decimal fixedAmount
+        +Decimal percentage
+        +Decimal minimumFee
+        +Decimal thresholdAmount
+        +Decimal feeBelowThreshold
+        +Decimal feeAboveThreshold
+        +Date effectiveFrom
+        +Date effectiveTo
+        +calculateFee(amount) Decimal
+    }
+
+    class Promotion {
+        +int promotionId
+        +Date startDate
+        +Date endDate
+        +boolean isActive
+        +isActiveOn(date) boolean
+    }
+
+    class EntryType {
+        <<enumeration>>
+        TOP_UP
+        HOLD
+        RELEASE
+        CHARGE
+        REFUND
+        COMMISSION
+    }
+
+    class VerificationLevel {
+        <<enumeration>>
+        BASIC
+        VERIFIED
+    }
+
+    class AccountType {
+        <<enumeration>>
+        CUSTOMER
+        AGENT
+        SYSTEM
+    }
+
+    Customer "1" --> "1" Wallet : owns
+    Wallet "1" --> "*" LedgerEntry : records
+    Wallet "1" --> "*" TopUp : receives
+    Customer "0..1" --> "*" TopUp : agent performs
+    Biller "1" *-- "*" Service : offers
+    Service "1" *-- "*" ServiceInputField : requires
+    Service "1" --> "*" FeeRule : priced by
+    Biller "1" --> "*" Promotion : has
+
+    Customer ..> VerificationLevel : uses
+    Customer ..> AccountType : uses
+    LedgerEntry ..> EntryType : uses
