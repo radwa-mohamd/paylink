@@ -34,9 +34,9 @@ Be honest: rejected or fixed answers earn marks when you explain why.
 - **Stage:** Design (ER diagram)
 - **Tool and model:** Claude
 - **Prompt:**
-  > I designed the first version of the tables myself and pasted my table design (customers, wallets, ledger_entries, billers, services, service_input_fields, fee_rules, promotions, transactions) and asked: "What do you think about this?" Then I asked it to apply its suggested changes so that there is no conflict with any other table.
-- **Summary of answer:** The AI found 3 main problems (a transactions table duplicating the ledger, no way to separate available from held balance, and no wallet for agents) and 2 small ones (no customer status for blocking, promotion dates). It then wrote the final Mermaid ER diagram with 9 tables.
-- **Verdict:** Accepted: my first design had these problems, not the AI. I checked each point against the brief (FR-5, FR-17, FR-21) and agreed. The separate "transactions" table duplicated "ledger_entries", which breaks the rule that the ledger is the single source of truth. I added top_ups, account_type and typed entry_type values (TOP_UP, HOLD, RELEASE, CHARGE, REFUND, COMMISSION).
+  > Review the US against the PayLink brief. Write a Mermaid Entity Relationship diagram for the App we built
+- **Summary of answer:** The AI produced a table design with a separate "transactions" table next to "ledger_entries". The design also had no wallet for agents, and the ledger could not separate available from held balance.
+- **Verdict:** Rejected: I did not accept the first design. I reviewed it and checked each point against the brief. The "transactions" table duplicated "ledger_entries", which breaks FR-5 (the ledger is the single source of truth for money). I removed it, and added top_ups, account_type and typed entry_type values (TOP_UP, HOLD, RELEASE, CHARGE, REFUND, COMMISSION).
 
 ### Entry 4
 
