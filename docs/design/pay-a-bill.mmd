@@ -1,0 +1,54 @@
+sequenceDiagram
+    actor C as Customer
+    participant P as PayLink
+    participant W as Wallet
+    participant B as ElectroCo
+
+    C->>P: Request bill inquiry
+    P->>B: Look up bill
+    B-->>P: Return bill amount
+    P-->>C: Show bill amount, service fee and total
+
+    C->>P: Confirm payment with idempotency key
+    P->>P: Check and reserve the key atomically
+
+    alt Same request already recorded
+        P-->>C: Return the original result or processing status
+    else New request
+        P->>P: Create Initiated payment and check limits and velocity
+        alt Payment checks fail
+            P->>P: Mark payment Rejected
+            P-->>C: Return rejection reason
+        else Payment checks pass
+            P->>W: Check available balance and hold the total atomically
+            alt Insufficient available balance
+                W-->>P: Hold denied
+                P->>P: Mark payment Rejected
+                P-->>C: Return insufficient balance reason
+            else Funds held
+                W-->>P: Hold confirmed
+                P->>P: Mark payment FundsHeld
+                P->>B: Send payment request
+                P->>P: Mark payment SentToBiller
+
+                alt Biller confirms within 10 seconds
+                    B-->>P: Confirm payment
+                    P->>W: Settle held funds
+                    W-->>P: Charge recorded
+                    P->>P: Mark payment Completed
+                    P-->>C: Return successful payment result
+                else Biller refuses within 10 seconds
+                    B-->>P: Refuse payment
+                    P->>P: Mark payment Failed
+                    P->>W: Release held funds
+                    W-->>P: Hold released
+                    P->>P: Mark payment Refunded
+                    P-->>C: Return failure reason
+                else No answer within 10 seconds
+                    P->>P: Mark payment Unknown
+                    P-->>C: Show that the payment is still processing
+                    Note over P,W: Funds stay held until the outcome is confirmed
+                end
+            end
+        end
+    end
