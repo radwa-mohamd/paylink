@@ -51,6 +51,42 @@ Be honest: rejected or fixed answers earn marks when you explain why.
 
 ## Member 2 - (name)
 
-## Member 3 - (name)
+## Member 3 - Jana
+
+## Entry 1
+- **Date:** 2026-11-24
+- **Author:** Jana
+- **Stage:** Requirements (part-3.md: Biller Integration and Reconciliation)
+- **Tool and model:** Claude (sonnet 5.5)
+- **Prompt:**
+
+ > Role: senior requirements analyst. Context: I own the Biller Integration and Reconciliation modules of PayLink (brief attached; billers ElectroCo, AquaCo, TopUpNet, NetCo). Task: write user stories with Given/When/Then acceptance criteria, measurable non-functional requirements, and a list of ambiguities with a proposed decision for each. Constraints: use only the rules in the brief; respect the payment life cycle in section 2.5; use Must/Should/Could priorities. Output: markdown tables.
+
+- **Summary of answer:** 13 Biller Integration stories, 7 Reconciliation stories, 6 NFRs and 5 ambiguities with decisions.
+- **Verdict:** Fixed. (1) US-BI-4 made an AquaCo overpayment Rejected, but section 2.5 allows Rejected only for a failed fraud check or insufficient funds; changed to Failed. (2) NFR-RC-2 (100,000 rows in 60 s) was invented, because the brief gives no file size or time; replaced with a target the team can justify.
+
+## Entry 2
+- **Date:** 2026-11-24
+- **Author:** Jana
+- **Stage:** Design (sequence, state and class diagrams)
+- **Tool and model:** Claude (sonnet 5.5)
+- **Prompt:**
+
+ > Write Mermaid diagrams for PayLink: a sequence diagram for "pay a bill", a sequence diagram for "refund a failed payment", the payment state diagram, and a class diagram for Biller Integration and Reconciliation. Use only the transitions in section 2.5 of the brief and keep names consistent across the diagrams.
+
+- **Summary of answer:** Four Mermaid files. Payment Processing orchestrates; an Unknown payment becomes Failed first and is only then refunded.
+- **Verdict:** Accepted after checking: the state diagram matches the table in section 2.5. Rendering result: (fill in after trying mermaid.live).
+
+## Entry 3
+- **Date:** 2026-11-24
+- **Author:** Jana
+- **Stage:** Design (use-case and ER diagrams)
+- **Tool and model:** Claude (sonnet 5.5)
+- **Prompt:**
+
+ > Write a Mermaid use-case diagram (as a flowchart) and a Mermaid ER diagram for Biller Integration and Reconciliation only. Actors: Customer, Support Employee, Admin, Scheduler, Biller. Tables I own: settlement file, settlement row, reconciliation report, reconciliation difference, callback log, retry attempt; show payment and biller as id-only stubs. Money columns must be exact decimals. Do not add states or tables outside my modules.
+
+- **Summary of answer:** 12 use cases in two boundaries; 8 entities (6 owned, 2 stubs) with nullable payment links for references PayLink does not know.
+Verdict: Pending: render both in mermaid.live, compare the stubs with Radwa's and Habiba's tables, then write Accepted or Fixed here with the reason.
 
 ## Member 4 - (name)
