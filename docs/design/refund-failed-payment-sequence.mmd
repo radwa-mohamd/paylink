@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant PP as Payment Processing
+    participant BI as Biller Integration
+    participant R as Reconciliation
+    participant W as Wallet / Ledger
+    participant A as Audit Log
+    participant N as Notifications
+    actor Sara as Customer
+
+    alt biller refuses the payment
+        BI-->>PP: Refused(reason)
+        PP->>PP: SentToBiller -> Failed
+    else Unknown resolved by re-query or callback
+        BI-->>PP: Refused
+        PP->>PP: Unknown -> Failed
+    else Unknown resolved by settlement file
+        R-->>PP: not listed in settlement file
+        PP->>PP: Unknown -> Failed
+    end
+    Note over PP: An Unknown payment is never refunded directly.<br/>Only a Failed payment is refunded.
+    PP->>W: release hold(total)
+    W->>W: ledger: reverse hold entries
+    W-->>PP: hold released, available balance restored
+    PP->>PP: Failed -> Refunded
+    PP->>A: who, when, why (money movement)
+    PP->>N: payment failed and refunded
+    N-->>Sara: SMS with clear reason

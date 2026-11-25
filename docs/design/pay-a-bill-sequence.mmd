@@ -1,0 +1,54 @@
+sequenceDiagram
+    actor Sara as Customer
+    participant API as Payment API
+    participant PP as Payment Processing
+    participant Fees as Fees
+    participant Fraud as Fraud Checks
+    participant W as Wallet / Ledger
+    participant BI as Biller Integration (adapter)
+    participant B as Biller (mock)
+    participant N as Notifications
+
+    Sara->>API: POST /payments (billerId, accountRef, Idempotency-Key)
+    API->>PP: pay(request)
+    PP->>PP: look up Idempotency-Key
+    alt key already used
+        PP-->>API: original result
+        API-->>Sara: same response as first request
+    else new key
+        PP->>BI: inquire(accountRef)
+        BI->>B: bill inquiry
+        B-->>BI: amount due
+        BI-->>PP: Bill(amount)
+        PP->>Fees: calculate(biller, amount)
+        Fees-->>PP: fee, total
+        PP->>Fraud: check(account, total)
+        alt fraud check fails or funds insufficient
+            PP->>PP: Initiated -> Rejected
+            PP-->>Sara: rejected with reason
+        else checks pass
+            PP->>W: hold(total)
+            W-->>PP: hold ledger entries
+            PP->>PP: Initiated -> FundsHeld
+            PP->>BI: pay(reference, amount)
+            PP->>PP: FundsHeld -> SentToBiller
+            BI->>B: payment request (unique reference)
+            alt biller confirms
+                B-->>BI: paid
+                BI-->>PP: Confirmed
+                PP->>W: hold to charge, credit fee income, agent commission if any
+                PP->>PP: SentToBiller -> Completed
+                PP->>N: payment completed
+                N-->>Sara: SMS and push receipt
+            else biller refuses
+                B-->>BI: error code
+                BI-->>PP: Refused(reason)
+                PP->>PP: SentToBiller -> Failed
+                Note over PP,W: continues in the refund sequence
+            else no answer within 10 s
+                BI-->>PP: NoAnswer
+                PP->>PP: SentToBiller -> Unknown
+                PP-->>Sara: being processed, money stays held
+            end
+        end
+    end
