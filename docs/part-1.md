@@ -216,19 +216,21 @@ Acceptance criteria:
    When a customer pays a water bill to AquaCo on 3 December,
    Then the normal fee of 2.50 EGP applies.
 
-## Assumptions
+## 4. Questions and decisions for my part
 
-These acceptance criteria are not directly stated in the brief. They are our assumptions and are listed among the open questions.
-
-- US-1 AC1: the wallet is created automatically at registration; registration uses
-  name, phone number and password.
-- US-1 AC2: a duplicate phone number is rejected.
-- US-1 AC3: a missing field is rejected.
-- US-2 AC2: payments made before the upgrade count toward the new daily limit.
-- US-3 AC2: each history item shows date, type and amount, ordered by date.
-- US-3 AC3: a customer sees only their own transactions.
-- US-4 AC3: a top-up of 0 or a negative amount is rejected.
-- US-5 AC1: the ledger entry fields are not defined in the brief.
-- US-5 AC2: a hold is recorded as its own ledger entry (our interpretation of FR-5).
-- US-6 AC3: a disabled biller is hidden from customers.
-- US-7 AC3: a disabled biller is not shown in the customer list.
+| #   | Question / ambiguity                                                                           | Decision                                                                                                                    |
+| --- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 1   | What is required to register, and is a wallet created automatically? (US-1)                    | Name, phone number and password. A wallet is created automatically with 0.00 EGP available and 0.00 EGP held.               |
+| 2   | What happens if the phone number is already registered, or a required field is missing? (US-1) | The registration is rejected with a clear error message and no account is created.                                          |
+| 3   | Who performs the upgrade to verified: an admin or an automatic process? (US-2, FR-2)           | An admin upgrades the customer. Verification is simulated.                                                                  |
+| 4   | Do payments made before the upgrade count toward the new daily limit? (US-2)                   | Yes. Remaining allowance = new limit minus what was already paid today.                                                     |
+| 5   | What must each history item show, and who can see it? (US-3)                                   | Date, type and amount, ordered by date. A customer sees only their own transactions.                                        |
+| 6   | What happens if a top-up amount is 0 or negative? (US-4)                                       | It is rejected and the balance does not change.                                                                             |
+| 7   | What happens if a simulated card top-up is declined? (US-4)                                    | It is saved with status DECLINED. No ledger entry is created and the balance does not change.                               |
+| 8   | What must a ledger entry contain? (US-5)                                                       | Wallet, entry type, amount, reference type and id, and timestamp, as in the ER diagram.                                     |
+| 9   | Is a hold recorded as its own ledger entry? (US-5, FR-5)                                       | Yes. HOLD reduces available and increases held; RELEASE and CHARGE reduce held as in the ER diagram.                        |
+| 10  | Is a disabled biller visible to customers? (US-6, US-7)                                        | No. It is hidden from the biller list.                                                                                      |
+| 11  | Are the required input fields of a biller configurable? (US-7)                                 | Yes, they are stored as data (service_input_fields). In Phase 1 validation only checks that each required field is present. |
+| 12  | If a promotion makes the fee 0, is the agent commission also 0? (FR-16, FR-17)                 | Yes, because the commission is 40% of the service fee.                                                                      |
+| 13  | Are the promotion start and end dates inclusive? (US-10)                                       | Yes, both days are inside the promotion.                                                                                    |
+| 14  | How are percentage fees rounded? (US-8)                                                        | Exact decimal, rounded to 2 decimal places (half up).                                                                       |
