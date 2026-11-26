@@ -1,0 +1,39 @@
+flowchart LR
+    Customer([Customer])
+    Support([Support Employee])
+    Admin([Admin])
+    Scheduler([Scheduler])
+    Biller([Biller - external system])
+
+    subgraph BI[Biller Integration]
+        UC1(Run bill inquiry)
+        UC2(Send payment to biller)
+        UC3(Re-query Unknown payment)
+        UC4(Receive biller callback)
+        UC5(Ignore duplicate callback)
+        UC6(Exchange NetCo batch files)
+        UC7(Configure biller adapter)
+    end
+
+    subgraph RC[Reconciliation]
+        UC8(Import settlement file)
+        UC9(Run nightly reconciliation)
+        UC10(Resolve Unknown payments)
+        UC11(View reconciliation report)
+        UC12(Review flagged difference)
+    end
+
+    Customer --- UC1
+    Biller --- UC4
+    Scheduler --- UC3
+    Scheduler --- UC6
+    Scheduler --- UC9
+    Support --- UC8
+    Support --- UC11
+    Support --- UC12
+    Admin --- UC7
+
+    UC2 -.->|include| UC1
+    UC5 -.->|extend| UC4
+    UC9 -.->|include| UC8
+    UC9 -.->|include| UC10

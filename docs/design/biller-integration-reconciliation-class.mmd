@@ -1,0 +1,91 @@
+classDiagram
+    class BillerAdapter {
+        <<interface>>
+        +inquire(accountRef) BillInquiry
+        +pay(reference, amount) BillerResult
+        +queryStatus(reference) BillerResult
+    }
+    class ElectroCoAdapter {
+        -apiVersion
+        -signer
+    }
+    class AquaCoAdapter {
+        -xmlMapper
+        -errorCodeMap
+    }
+    class TopUpNetAdapter {
+        +handleCallback(payload) CallbackResult
+    }
+    class NetCoBatchAdapter {
+        +uploadDailyBatch()
+        +readResultFile()
+    }
+    class BillerAdapterFactory {
+        +forBiller(billerId) BillerAdapter
+    }
+    class BillerResult {
+        +outcome : CONFIRMED / REFUSED / NO_ANSWER / ACCEPTED
+        +reasonCode
+        +billerReference
+    }
+    class BillInquiry {
+        +amountDue : Decimal
+        +currency
+    }
+    class CallbackHandler {
+        +receive(payload)
+        -verifySignature()
+        -isDuplicate(reference)
+    }
+    class RetryUnknownCommand {
+        +reference
+        +attempt
+        +execute()
+    }
+    class RetryScheduler {
+        +schedule(command, delay)
+    }
+    class ReconciliationService {
+        +reconcile(billerId, date) ReconciliationReport
+        -resolveUnknown()
+    }
+    class SettlementParser {
+        <<interface>>
+        +parse(file) List~SettlementRow~
+    }
+    class SettlementRow {
+        +reference
+        +amount : Decimal
+        +status
+    }
+    class ReconciliationReport {
+        +billerId
+        +date
+        +differences : List~Difference~
+    }
+    class Difference {
+        +reference
+        +type : STATUS / AMOUNT / UNKNOWN_TO_PAYLINK
+    }
+    class PaymentProcessingPort {
+        <<interface>>
+        +reportOutcome(reference, BillerResult)
+    }
+
+    BillerAdapter <|.. ElectroCoAdapter
+    BillerAdapter <|.. AquaCoAdapter
+    BillerAdapter <|.. TopUpNetAdapter
+    BillerAdapter <|.. NetCoBatchAdapter
+    BillerAdapterFactory ..> BillerAdapter : creates
+    BillerAdapter ..> BillerResult
+    BillerAdapter ..> BillInquiry
+    TopUpNetAdapter --> CallbackHandler
+    CallbackHandler ..> PaymentProcessingPort
+    RetryUnknownCommand ..> BillerAdapterFactory
+    RetryUnknownCommand ..> PaymentProcessingPort
+    RetryScheduler o-- RetryUnknownCommand
+    ReconciliationService --> SettlementParser
+    SettlementParser ..> SettlementRow
+    ReconciliationService ..> ReconciliationReport
+    ReconciliationReport o-- Difference
+    ReconciliationService ..> PaymentProcessingPort

@@ -1,0 +1,64 @@
+erDiagram
+    biller ||--o{ settlement_file : "sends"
+    settlement_file ||--o{ settlement_row : "contains"
+    settlement_file ||--|| reconciliation_report : "is checked by"
+    reconciliation_report ||--o{ reconciliation_difference : "lists"
+    payment |o--o{ settlement_row : "matched to"
+    payment |o--o{ reconciliation_difference : "concerns"
+    biller ||--o{ callback_log : "calls us"
+    payment |o--o{ callback_log : "updates"
+    payment ||--o{ retry_attempt : "is re-queried by"
+
+    biller {
+        bigint id PK "owned by Biller Catalog"
+    }
+    payment {
+        bigint id PK "owned by Payment Processing"
+    }
+    settlement_file {
+        bigint id PK
+        bigint biller_id FK
+        date file_date
+        timestamp received_at
+        varchar status
+    }
+    settlement_row {
+        bigint id PK
+        bigint settlement_file_id FK
+        varchar biller_reference
+        decimal amount "numeric(12,2)"
+        varchar status
+        bigint matched_payment_id FK "nullable"
+    }
+    reconciliation_report {
+        bigint id PK
+        bigint settlement_file_id FK
+        timestamp run_at
+        int total_rows
+        int total_differences
+    }
+    reconciliation_difference {
+        bigint id PK
+        bigint report_id FK
+        bigint payment_id FK "nullable"
+        varchar biller_reference
+        varchar type "STATUS, AMOUNT, UNKNOWN_TO_PAYLINK"
+        varchar review_status
+    }
+    callback_log {
+        bigint id PK
+        bigint biller_id FK
+        bigint payment_id FK "nullable"
+        timestamp received_at
+        boolean is_duplicate
+        boolean signature_valid
+        text payload
+    }
+    retry_attempt {
+        bigint id PK
+        bigint payment_id FK
+        int attempt_no
+        timestamp scheduled_at
+        timestamp executed_at "nullable"
+        varchar outcome
+    }
