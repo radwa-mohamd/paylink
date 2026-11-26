@@ -49,8 +49,56 @@ Be honest: rejected or fixed answers earn marks when you explain why.
 - **Summary of answer:** 9 classes and 3 enumerations. The wallet has no stored balance; getAvailableBalance() and getHeldBalance() compute it from ledger entries.
 - **Verdict:** Accepted: I rendered it in mermaid.live and checked it against the ER diagram.
 
-## Member 2 - (name)
+## Member 2 - Habiba
 
+### Entry 1
+
+- **Date:** 2026-11-24
+- **Author:** Habiba
+- **Stage:** Design clarification
+- **Tool and model:** ChatGPT
+- **Prompt (English translation):**
+  > Does the PayLink assignment require us to write the diagrams in Mermaid?
+- **Summary of answer:** The brief allows Mermaid or PlantUML and requires
+  the diagram source files in `docs/design/`.
+- **Verdict:** Accepted: I used Mermaid `.mmd` files to match the team's
+  existing diagrams.
+
+### Entry 2
+
+- **Date:** 2026-11-24
+- **Author:** Habiba
+- **Stage:** Design (payment diagrams)
+- **Tool and model:** ChatGPT
+- **Prompt (English summary):**
+  > Using the PayLink brief and the Part 2 payment scenarios, help me
+  > prepare the payment state diagram and the pay-a-bill sequence diagram
+  > in Mermaid.
+- **Summary of answer:** ChatGPT drafted a state diagram for the payment
+  lifecycle and a sequence diagram showing how the customer, PayLink,
+  the wallet, and ElectroCo interact during a payment.
+- **Verdict:** Accepted: I reviewed both Mermaid diagrams against the
+  PayLink brief. I checked that a timeout moves the payment to `Unknown`
+  with the funds still held, and that a confirmed failure moves from
+  `Failed` to `Refunded` after the hold is released.
+
+### Entry 3
+
+- **Date:** 2026-11-24
+- **Author:** Habiba
+- **Stage:** Requirements and design review
+- **Tool and model:** ChatGPT
+- **Prompt (English summary):**
+  > Review my Part 2 user stories and payment diagrams. Flag any
+  > acceptance criteria or diagram steps that need clarification.
+- **Summary of answer:** ChatGPT flagged that the concurrent duplicate
+  request scenario in US-13 expected one hold and one biller call
+  without specifying a valid payment and sufficient wallet funds.
+  It also checked that a biller timeout leaves the funds held.
+- **Verdict:** Fixed: I updated the second acceptance criterion in US-13
+  to specify a valid request and sufficient available funds. The scenario
+  now checks that two copies of the same valid request create one payment,
+  one hold, and one request to the biller.
 
 ## Member 3 - Jana
 
