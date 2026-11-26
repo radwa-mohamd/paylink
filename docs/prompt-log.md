@@ -51,6 +51,7 @@ Be honest: rejected or fixed answers earn marks when you explain why.
 
 ## Member 2 - (name)
 
+
 ## Member 3 - Jana
 
 ## Entry 1
