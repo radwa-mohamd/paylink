@@ -1,0 +1,137 @@
+@startuml use-case
+title PayLink - Use Case Diagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Customer" as C
+actor "Agent" as A
+actor "Support Employee" as S
+actor "Admin" as AD
+actor "Biller\n(ElectroCo, AquaCo,\nTopUpNet, NetCo)" as B <<external>>
+actor "SMS / Email /\nPush Provider" as N <<external>>
+actor "Scheduler\n(time)" as T <<system>>
+
+rectangle "PayLink Backend" {
+
+  package "Accounts & Wallet" {
+    usecase "Register (FR-1)" as UC1
+    usecase "Upgrade to verified (FR-2)" as UC2
+    usecase "View balance & history (FR-3)" as UC3
+    usecase "Top up wallet (FR-4)" as UC4
+  }
+
+  package "Biller Catalog" {
+    usecase "View billers & input fields (FR-7)" as UC7
+    usecase "Manage billers & services (FR-6)" as UC6
+  }
+
+  package "Payment Processing" {
+    usecase "Bill inquiry (FR-8)" as UC8
+    usecase "Pay a bill (FR-9)" as UC9
+    usecase "Pay on behalf of customer (FR-17)" as UC17
+    usecase "Validate idempotency key (FR-10)" as UC10
+    usecase "Hold funds (FR-12)" as UC12
+    usecase "Release held funds (FR-12)" as UC12r
+    usecase "Request refund (FR-27)" as UC27
+    usecase "Approve refund (FR-27)" as UC27b
+    usecase "Re-query Unknown payment (FR-13)" as UC13
+  }
+
+  package "Fees & Commissions" {
+    usecase "Calculate service fee (FR-16)" as UCF
+    usecase "Calculate agent commission (FR-17)" as UCK
+  }
+
+  package "Biller Integration" {
+    usecase "Process biller payment (FR-15)" as UCP
+    usecase "Handle biller response (FR-15)" as UCR
+    usecase "Handle biller callback\n(FR-14, TopUpNet)" as UC14
+  }
+
+  package "Fraud Checks" {
+    usecase "Check limits & velocity (FR-18, FR-19)" as UC18
+  }
+
+  package "Support & Admin" {
+    usecase "Search payment by reference (FR-20)" as UC20
+    usecase "Block / unblock account (FR-21)" as UC21
+    usecase "Edit fees & limits (FR-24)" as UC24
+    usecase "View daily totals (FR-28)" as UC28
+    usecase "View audit log (extra)" as UC25v
+  }
+
+  package "Audit" {
+    usecase "Record audit log entry (FR-25)" as UC25
+  }
+
+  package "Notifications" {
+    usecase "Send SMS & push (FR-22)" as UC22
+    usecase "Retry failed notification (FR-23)" as UC23
+  }
+
+  package "Reconciliation" {
+    usecase "Produce reconciliation report (FR-26)" as UC26
+  }
+}
+
+C --> UC1
+C --> UC2
+C --> UC3
+C --> UC4
+C --> UC7
+C --> UC8
+C --> UC9
+C --> UC27
+A --> UC17
+A --> UC4
+A --> UC8
+
+UC20 <-- S
+UC21 <-- S
+UC27b <-- S
+UC26 <-- S
+
+UC6 <-- AD
+UC24 <-- AD
+UC28 <-- AD
+UC25v <-- AD
+
+UCP <-- B
+UCR <-- B
+UC14 <-- B
+T --> UC13
+T --> UC23
+T --> UC26
+UC22 <-- N
+
+' include: arrow from base to included
+UC9 ..> UC8 : <<include>>
+UC9 ..> UC10 : <<include>>
+UC9 ..> UC18 : <<include>>
+UC9 ..> UC12 : <<include>>
+UC9 ..> UCP : <<include>>
+UC9 ..> UCF : <<include>>
+UC9 ..> UC22 : <<include>>
+UC8 ..> UCF : <<include>>
+UC17 ..> UC9 : <<include>>
+UC17 ..> UCK : <<include>>
+UCP ..> UCR : <<include>>
+UC14 ..> UCR : <<include>>
+UC14 ..> UC22 : <<include>>
+
+' audit entries
+UC4 ..> UC25 : <<include>>
+UC9 ..> UC25 : <<include>>
+UC27b ..> UC25 : <<include>>
+UCK ..> UC25 : <<include>>
+UC24 ..> UC25 : <<include>>
+UC21 ..> UC25 : <<include>>
+UC6 ..> UC25 : <<include>>
+
+' extend: arrow from extending to base
+UC23 ..> UC22 : <<extend>>
+UC13 ..> UC9 : <<extend>>
+UC12r ..> UC9 : <<extend>>\n[payment failed]
+UC12r ..> UC25 : <<include>>
+@enduml
